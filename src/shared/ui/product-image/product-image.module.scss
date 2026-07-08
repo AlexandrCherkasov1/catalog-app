@@ -1,0 +1,21 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  background: var(--blue-background-color);
+}
+
+.image {
+  object-fit: contain;
+}
+
+.fallback {
+  padding: 16px;
+  color: var(--grey-color);
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+}
