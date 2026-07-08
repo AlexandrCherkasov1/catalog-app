@@ -1,0 +1,39 @@
+{
+  "name": "ohota",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "format": "node scripts/format.mjs",
+    "format:check": "node scripts/check-format.mjs",
+    "test": "npm run typecheck",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "next": "15.5.20",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/eslint-plugin": "8.38.0",
+    "@typescript-eslint/parser": "8.38.0",
+    "eslint": "9.31.0",
+    "eslint-config-next": "15.5.20",
+    "husky": "9.1.7",
+    "prettier": "3.9.4",
+    "sass": "1.89.2",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.10"
+    }
+  }
+}
