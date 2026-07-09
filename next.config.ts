@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ohotaktiv.ru",
       },
+      {
+        protocol: "https",
+        hostname: "img.ohotaktiv.ru",
+      },
     ],
   },
 };

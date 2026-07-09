@@ -6,3 +6,4 @@ export type {
   ProductsResponseDto,
   ProductTraitsDto,
 } from "./model";
+export { ProductCard } from "./ui";
