@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { AppLayout } from "@widgets/app-layout";
+
 import { StoreProvider } from "./providers";
 import "./globals.scss";
 
@@ -16,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider>
+          <AppLayout>{children}</AppLayout>
+        </StoreProvider>
       </body>
     </html>
   );

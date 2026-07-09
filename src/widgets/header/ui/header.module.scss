@@ -1,0 +1,185 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  border-bottom: 1px solid var(--grey-lines-color);
+  background: var(--white-color);
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  max-width: 1680px;
+  min-height: 70px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.primary {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  flex: 0 0 50px;
+  border-radius: var(--border-radius-small);
+}
+
+.logo img {
+  display: block;
+  border-radius: var(--border-radius-small);
+}
+
+.catalog {
+  position: relative;
+  display: flex;
+  min-width: 110px;
+  min-height: 50px;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--border-radius-small);
+  background: var(--primary-color);
+  font-weight: 700;
+}
+
+.catalog:hover {
+  background: var(--hover-primary-color);
+}
+
+.search {
+  display: flex;
+  min-width: 200px;
+  min-height: 50px;
+  padding: 0 18px;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius-small);
+  color: var(--grey-color);
+  font-weight: 600;
+}
+
+.navigation {
+  display: flex;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  align-items: stretch;
+  gap: 4px;
+  list-style: none;
+}
+
+.link {
+  position: relative;
+  display: flex;
+  min-width: 112px;
+  height: 100%;
+  padding: 0 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--secondary-color);
+  font-weight: 600;
+}
+
+.link:hover {
+  background: var(--blue-background-color);
+}
+
+.catalog:focus-visible,
+.link:focus-visible {
+  outline: 2px solid var(--black-color);
+  outline-offset: 2px;
+}
+
+.active::after {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  left: 10px;
+  height: 2px;
+  background: var(--black-color);
+  content: "";
+}
+
+.catalog.active::after {
+  content: none;
+}
+
+.icon {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.count {
+  position: absolute;
+  right: -7px;
+  bottom: -5px;
+  display: flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: var(--black-color);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+@media (max-width: 1199px) {
+  .link {
+    min-width: 52px;
+  }
+
+  .link > span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    min-height: 60px;
+    padding: 8px 16px;
+  }
+
+  .primary {
+    gap: 8px;
+  }
+
+  .logo {
+    flex-basis: 44px;
+  }
+
+  .logo img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .catalog {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+  }
+
+  .catalog span,
+  .search {
+    display: none;
+  }
+
+  .link {
+    min-width: 44px;
+    padding: 0 8px;
+  }
+}
