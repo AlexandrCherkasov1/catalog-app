@@ -1,0 +1,1 @@
+export { getProductPrice } from "./get-product-price";

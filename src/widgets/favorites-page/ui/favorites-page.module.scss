@@ -1,0 +1,90 @@
+.list {
+  display: grid;
+  margin-top: 20px;
+  gap: 12px;
+}
+
+.item,
+.skeleton {
+  display: grid;
+  min-height: 128px;
+  padding: 16px;
+  grid-template-columns: 96px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 16px;
+}
+
+.image,
+.skeletonImage {
+  width: 96px;
+  height: 96px;
+}
+
+.info {
+  min-width: 0;
+}
+
+.info h2 {
+  margin: 2px 0 10px;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.available,
+.unavailable {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.available {
+  color: #388000;
+}
+
+.unavailable {
+  color: var(--grey-color);
+}
+
+.remove {
+  width: 44px;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.actionIcon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  color: var(--black-color);
+  stroke: currentcolor;
+  stroke-width: 2;
+}
+
+.skeletonContent {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 767px) {
+  .item,
+  .skeleton {
+    padding: 10px;
+    grid-template-columns: 76px minmax(0, 1fr) 40px;
+    gap: 10px;
+  }
+
+  .image,
+  .skeletonImage {
+    width: 76px;
+    height: 76px;
+  }
+
+  .info h2 {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}

@@ -1,9 +1,12 @@
 "use client";
 
-import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
+import { Heart, Search, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { useAppSelector } from "@app/store";
+import { selectCartTotalCount, selectFavoritesCount } from "@entities/product";
 
 import styles from "./header.module.scss";
 
@@ -23,6 +26,12 @@ const navigation = [
 export function Header() {
   const pathname = usePathname();
   const isCatalogActive = pathname === "/";
+  const cartCount = useAppSelector(selectCartTotalCount);
+  const favoritesCount = useAppSelector(selectFavoritesCount);
+  const countsByHref: Record<string, number> = {
+    "/favorites": favoritesCount,
+    "/cart": cartCount,
+  };
 
   return (
     <header className={styles.header}>
@@ -43,7 +52,6 @@ export function Header() {
             href="/"
             aria-current={isCatalogActive ? "page" : undefined}
           >
-            <Menu aria-hidden="true" size={20} />
             <span>Каталог</span>
           </Link>
 
@@ -57,6 +65,7 @@ export function Header() {
           <ul className={styles.navigation}>
             {navigation.map(({ href, icon: Icon, label }) => {
               const isActive = pathname === href;
+              const count = countsByHref[href] ?? 0;
 
               return (
                 <li key={href}>
@@ -67,7 +76,7 @@ export function Header() {
                   >
                     <span className={styles.icon}>
                       <Icon aria-hidden="true" size={24} strokeWidth={2} />
-                      <span className={styles.count}>0</span>
+                      <span className={styles.count}>{count}</span>
                     </span>
                     <span>{label}</span>
                   </Link>

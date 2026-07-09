@@ -1,4 +1,22 @@
 export { productsApi, useGetProductsQuery } from "./api";
+export { getProductPrice } from "./lib";
+export {
+  addToCart,
+  addToFavorites,
+  cartReducer,
+  decreaseCartItem,
+  favoritesReducer,
+  removeFromCart,
+  removeFromFavorites,
+  selectCartItemQuantity,
+  selectCartItems,
+  selectCartProductIds,
+  selectCartTotalCount,
+  selectFavoriteIds,
+  selectFavoritesCount,
+  selectIsProductFavorite,
+  selectIsProductInCart,
+} from "./model";
 export type {
   ProductCharacteristicDto,
   ProductDto,

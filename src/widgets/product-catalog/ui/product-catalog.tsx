@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import { ProductCard, useGetProductsQuery } from "@entities/product";
 import { Button, Card, EmptyState, Skeleton } from "@shared/ui";
 
 import styles from "./product-catalog.module.scss";
 
 const SKELETON_COUNT = 8;
+const INITIAL_VISIBLE_COUNT = 8;
+const VISIBLE_COUNT_STEP = 8;
 
 function CatalogSkeleton() {
   return (
@@ -27,6 +31,37 @@ function CatalogSkeleton() {
 
 export function ProductCatalog() {
   const { data, isError, isLoading, refetch } = useGetProductsQuery();
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
+  }, [data?.items.length]);
+
+  useEffect(() => {
+    const loader = loaderRef.current;
+
+    if (!loader || !data || visibleCount >= data.items.length) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setVisibleCount((current) =>
+            Math.min(current + VISIBLE_COUNT_STEP, data.items.length),
+          );
+        }
+      },
+      {
+        rootMargin: "240px",
+      },
+    );
+
+    observer.observe(loader);
+
+    return () => observer.disconnect();
+  }, [data, visibleCount]);
 
   if (isLoading) {
     return <CatalogSkeleton />;
@@ -36,7 +71,7 @@ export function ProductCatalog() {
     return (
       <EmptyState
         title="Не удалось загрузить товары"
-        description="Проверьте подключение к интернету и попробуйте ещё раз."
+        description="Проверьте подключение к интернету и попробуйте еще раз."
         action={<Button onClick={() => void refetch()}>Повторить</Button>}
       />
     );
@@ -51,18 +86,20 @@ export function ProductCatalog() {
     );
   }
 
+  const visibleItems = data.items.slice(0, visibleCount);
+  const hasMoreItems = visibleCount < data.items.length;
+
   return (
     <>
       <p className={styles.count}>Товаров: {data.count_items}</p>
       <div className={styles.grid}>
-        {data.items.map((product, index) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            priority={index < 4}
-          />
+        {visibleItems.map((product, index) => (
+          <div className={styles.item} key={product.id}>
+            <ProductCard product={product} priority={index < 4} />
+          </div>
         ))}
       </div>
+      {hasMoreItems && <div className={styles.loader} ref={loaderRef} />}
     </>
   );
 }

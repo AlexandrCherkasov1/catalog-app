@@ -99,6 +99,19 @@
   margin-top: auto;
 }
 
+.actions {
+  display: grid;
+  margin-top: 16px;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  gap: 8px;
+}
+
+.favorite {
+  width: 44px;
+  padding-right: 0;
+  padding-left: 0;
+}
+
 @media (max-width: 767px) {
   .image {
     padding: 10px;

@@ -1,6 +1,18 @@
-import { Badge, Card, Price, ProductImage } from "@shared/ui";
+"use client";
 
-import type { ProductDto } from "../../model";
+import { Heart } from "lucide-react";
+import { useMemo } from "react";
+
+import { useAppDispatch, useAppSelector } from "@app/store";
+import { Badge, Button, Card, Price, ProductImage } from "@shared/ui";
+
+import {
+  addToCart,
+  addToFavorites,
+  selectIsProductFavorite,
+  selectIsProductInCart,
+  type ProductDto,
+} from "../../model";
 import styles from "./product-card.module.scss";
 
 interface ProductCardProps {
@@ -9,8 +21,24 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, priority = false }: ProductCardProps) {
+  const dispatch = useAppDispatch();
   const hasDiscount = product.price_discount < product.price;
   const labels = Object.values(product.labels);
+  const selectInCart = useMemo(
+    () => selectIsProductInCart(product.id),
+    [product.id],
+  );
+  const selectFavorite = useMemo(
+    () => selectIsProductFavorite(product.id),
+    [product.id],
+  );
+  const isInCart = useAppSelector(selectInCart);
+  const isFavorite = useAppSelector(selectFavorite);
+  const cartText = product.available
+    ? isInCart
+      ? "В корзине"
+      : "В корзину"
+    : "Отсутствует";
 
   return (
     <Card className={styles.card}>
@@ -50,6 +78,24 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           value={hasDiscount ? product.price_discount : product.price}
           oldValue={hasDiscount ? product.price : undefined}
         />
+        <div className={styles.actions}>
+          <Button
+            fullWidth
+            disabled={!product.available || isInCart}
+            onClick={() => dispatch(addToCart(product.id))}
+          >
+            {cartText}
+          </Button>
+          <Button
+            className={styles.favorite}
+            variant={isFavorite ? "primary" : "outline"}
+            disabled={isFavorite}
+            aria-label={isFavorite ? "В избранном" : "В избранное"}
+            onClick={() => dispatch(addToFavorites(product.id))}
+          >
+            <Heart aria-hidden="true" size={20} />
+          </Button>
+        </div>
       </div>
     </Card>
   );
