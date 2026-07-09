@@ -6,6 +6,11 @@ interface CartState {
   items: Record<ProductId, number>;
 }
 
+interface RestoreCartItemPayload {
+  productId: ProductId;
+  quantity: number;
+}
+
 const initialState: CartState = {
   items: {},
 };
@@ -40,9 +45,21 @@ export const cartSlice = createSlice({
     removeFromCart: (state, action: PayloadAction<ProductId>) => {
       delete state.items[action.payload];
     },
+    restoreCartItem: (state, action: PayloadAction<RestoreCartItemPayload>) => {
+      const { productId, quantity } = action.payload;
+
+      if (quantity > 0) {
+        state.items[productId] = quantity;
+      }
+    },
   },
 });
 
-export const { addToCart, decreaseCartItem, hydrateCart, removeFromCart } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  decreaseCartItem,
+  hydrateCart,
+  removeFromCart,
+  restoreCartItem,
+} = cartSlice.actions;
 export const cartReducer = cartSlice.reducer;

@@ -2,7 +2,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid transparent;
   border-radius: var(--border-radius-small);
   color: var(--black-color);
@@ -55,14 +55,14 @@
 }
 
 .small {
-  min-height: 36px;
-  padding: 5px 12px;
+  min-height: 40px;
+  padding: 5px 10px;
   font-size: 12px;
 }
 
 .medium {
-  min-height: 44px;
-  padding: 9px 20px;
+  min-height: 50px;
+  padding: 10px 20px;
   font-size: 14px;
 }
 

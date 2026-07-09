@@ -4,6 +4,7 @@ export {
   decreaseCartItem,
   hydrateCart,
   removeFromCart,
+  restoreCartItem,
 } from "./cart-slice";
 export {
   addToFavorites,

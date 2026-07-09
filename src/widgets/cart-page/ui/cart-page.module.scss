@@ -1,3 +1,11 @@
+.root {
+  min-width: 0;
+}
+
+.state {
+  margin-top: 20px;
+}
+
 .content {
   display: grid;
   margin-top: 20px;
@@ -8,23 +16,23 @@
 
 .list {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .item,
 .skeleton {
   display: grid;
-  min-height: 128px;
-  padding: 16px;
-  grid-template-columns: 96px minmax(0, 1fr) 132px 44px;
+  min-height: 140px;
+  padding: 20px;
+  grid-template-columns: 100px minmax(0, 1fr) 140px 40px;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .image,
 .skeletonImage {
-  width: 96px;
-  height: 96px;
+  width: 100px;
+  height: 100px;
 }
 
 .info {
@@ -43,22 +51,22 @@
 
 .quantity {
   display: grid;
-  grid-template-columns: 36px 40px 36px;
+  grid-template-columns: 40px 40px 40px;
   align-items: center;
   justify-content: center;
 }
 
 .quantity span {
   font-weight: 700;
-  line-height: 36px;
+  line-height: 40px;
   text-align: center;
 }
 
 .quantityButton {
   display: flex;
-  width: 36px;
-  height: 36px;
-  min-height: 36px;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
   padding: 0;
   align-items: center;
   justify-content: center;
@@ -71,6 +79,21 @@
 .quantityButton:hover,
 .remove:hover {
   border-color: var(--black-color);
+}
+
+.quantityButton:disabled {
+  color: var(--grey-color);
+  background: var(--blue-background-color);
+  cursor: not-allowed;
+}
+
+.quantityButton:disabled:hover {
+  border-color: var(--grey-lines-color);
+}
+
+.quantityButton:disabled .actionIcon {
+  color: var(--grey-color);
+  stroke: var(--grey-color);
 }
 
 .quantityButton:focus-visible,
@@ -91,8 +114,8 @@
 
 .remove {
   display: flex;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   align-items: center;
   justify-content: center;
@@ -105,7 +128,7 @@
 .summary {
   display: grid;
   padding: 20px;
-  gap: 14px;
+  gap: 20px;
 }
 
 .summary h2 {
@@ -119,7 +142,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 20px;
   font-size: 16px;
   line-height: 24px;
 }
@@ -134,7 +157,7 @@
 
 .skeletonContent {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 @media (max-width: 1023px) {
@@ -147,14 +170,14 @@
   .item,
   .skeleton {
     padding: 10px;
-    grid-template-columns: 76px minmax(0, 1fr) 40px;
+    grid-template-columns: 80px minmax(0, 1fr) 40px;
     gap: 10px;
   }
 
   .image,
   .skeletonImage {
-    width: 76px;
-    height: 76px;
+    width: 80px;
+    height: 80px;
   }
 
   .info h2 {
@@ -164,7 +187,7 @@
 
   .quantity {
     grid-column: 2 / 4;
-    grid-template-columns: 36px 40px 36px;
+    grid-template-columns: 40px 40px 40px;
     justify-content: start;
   }
 

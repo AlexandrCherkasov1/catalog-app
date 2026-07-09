@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   getProductPrice,
@@ -13,8 +13,7 @@ import { Button, Card, EmptyState, Skeleton } from "@shared/ui";
 import styles from "./product-catalog.module.scss";
 
 const SKELETON_COUNT = 8;
-const INITIAL_VISIBLE_COUNT = 8;
-const VISIBLE_COUNT_STEP = 8;
+const PRODUCTS_PER_PAGE = 8;
 const SEARCH_DEBOUNCE_MS = 350;
 const ALL_VALUE = "all";
 
@@ -69,7 +68,7 @@ function getProductType(product: ProductDto) {
     return "Полуавтоматический";
   }
 
-  return product.cml2_traits?.value ?? null;
+  return null;
 }
 
 function sortValues(values: string[]) {
@@ -80,7 +79,6 @@ function sortValues(values: string[]) {
 
 export function ProductCatalog() {
   const { data, isError, isLoading, refetch } = useGetProductsQuery();
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
   const [availability, setAvailability] =
@@ -90,7 +88,7 @@ export function ProductCatalog() {
   const [category, setCategory] = useState(ALL_VALUE);
   const [productType, setProductType] = useState(ALL_VALUE);
   const [sort, setSort] = useState<SortValue>("default");
-  const loaderRef = useRef<HTMLDivElement | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -193,13 +191,22 @@ export function ProductCatalog() {
     sort,
   ]);
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE),
+  );
+  const pageStartIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const pageProducts = filteredProducts.slice(
+    pageStartIndex,
+    pageStartIndex + PRODUCTS_PER_PAGE,
+  );
+
   useEffect(() => {
-    setVisibleCount(INITIAL_VISIBLE_COUNT);
+    setCurrentPage(1);
   }, [
     availability,
     category,
     debouncedSearchValue,
-    filteredProducts.length,
     maxPrice,
     minPrice,
     productType,
@@ -207,29 +214,10 @@ export function ProductCatalog() {
   ]);
 
   useEffect(() => {
-    const loader = loaderRef.current;
-
-    if (!loader || visibleCount >= filteredProducts.length) {
-      return;
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
     }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setVisibleCount((current) =>
-            Math.min(current + VISIBLE_COUNT_STEP, filteredProducts.length),
-          );
-        }
-      },
-      {
-        rootMargin: "240px",
-      },
-    );
-
-    observer.observe(loader);
-
-    return () => observer.disconnect();
-  }, [filteredProducts.length, visibleCount]);
+  }, [currentPage, totalPages]);
 
   function resetFilters() {
     setSearchValue("");
@@ -240,6 +228,7 @@ export function ProductCatalog() {
     setCategory(ALL_VALUE);
     setProductType(ALL_VALUE);
     setSort("default");
+    setCurrentPage(1);
   }
 
   if (isLoading) {
@@ -264,9 +253,6 @@ export function ProductCatalog() {
       />
     );
   }
-
-  const visibleItems = filteredProducts.slice(0, visibleCount);
-  const hasMoreItems = visibleCount < filteredProducts.length;
 
   return (
     <>
@@ -368,13 +354,47 @@ export function ProductCatalog() {
       ) : (
         <>
           <div className={styles.grid}>
-            {visibleItems.map((product, index) => (
+            {pageProducts.map((product, index) => (
               <div className={styles.item} key={product.id}>
                 <ProductCard product={product} priority={index < 4} />
               </div>
             ))}
           </div>
-          {hasMoreItems && <div className={styles.loader} ref={loaderRef} />}
+          {totalPages > 1 && (
+            <nav className={styles.pagination} aria-label="Страницы каталога">
+              <Button
+                variant="outline"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((page) => page - 1)}
+              >
+                Назад
+              </Button>
+              <div className={styles.pages}>
+                {Array.from({ length: totalPages }, (_, index) => {
+                  const page = index + 1;
+
+                  return (
+                    <button
+                      className={page === currentPage ? styles.currentPage : ""}
+                      type="button"
+                      key={page}
+                      aria-current={page === currentPage ? "page" : undefined}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </div>
+              <Button
+                variant="outline"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((page) => page + 1)}
+              >
+                Вперед
+              </Button>
+            </nav>
+          )}
         </>
       )}
     </>

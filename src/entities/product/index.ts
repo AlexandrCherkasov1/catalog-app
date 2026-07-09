@@ -10,6 +10,7 @@ export {
   hydrateFavorites,
   removeFromCart,
   removeFromFavorites,
+  restoreCartItem,
   selectCartItemQuantity,
   selectCartItems,
   selectCartProductIds,
