@@ -19,6 +19,9 @@ export const cartSlice = createSlice({
 
       state.items[productId] = (state.items[productId] ?? 0) + 1;
     },
+    hydrateCart: (state, action: PayloadAction<Record<ProductId, number>>) => {
+      state.items = action.payload;
+    },
     decreaseCartItem: (state, action: PayloadAction<ProductId>) => {
       const productId = action.payload;
       const quantity = state.items[productId];
@@ -40,6 +43,6 @@ export const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, decreaseCartItem, removeFromCart } =
+export const { addToCart, decreaseCartItem, hydrateCart, removeFromCart } =
   cartSlice.actions;
 export const cartReducer = cartSlice.reducer;

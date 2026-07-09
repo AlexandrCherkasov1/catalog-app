@@ -6,6 +6,8 @@ export {
   cartReducer,
   decreaseCartItem,
   favoritesReducer,
+  hydrateCart,
+  hydrateFavorites,
   removeFromCart,
   removeFromFavorites,
   selectCartItemQuantity,

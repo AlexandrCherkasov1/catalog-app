@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 
 import { createAppStore } from "../store";
 import type { AppStore } from "../store";
+import { PersistProductState } from "./persist-product-state";
 
 interface StoreProviderProps {
   children: React.ReactNode;
@@ -17,5 +18,10 @@ export function StoreProvider({ children }: StoreProviderProps) {
     storeRef.current = createAppStore();
   }
 
-  return <Provider store={storeRef.current}>{children}</Provider>;
+  return (
+    <Provider store={storeRef.current}>
+      <PersistProductState />
+      {children}
+    </Provider>
+  );
 }

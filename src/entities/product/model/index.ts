@@ -2,11 +2,13 @@ export {
   addToCart,
   cartReducer,
   decreaseCartItem,
+  hydrateCart,
   removeFromCart,
 } from "./cart-slice";
 export {
   addToFavorites,
   favoritesReducer,
+  hydrateFavorites,
   removeFromFavorites,
 } from "./favorites-slice";
 export {
