@@ -1,0 +1,11 @@
+.actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  gap: 10px;
+}
+
+.favorite {
+  width: 40px;
+  padding-right: 0;
+  padding-left: 0;
+}

@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { Header } from "@widgets/header";
 
 import styles from "./app-layout.module.scss";
@@ -9,7 +11,9 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className={styles.layout}>
-      <Header />
+      <Suspense fallback={null}>
+        <Header />
+      </Suspense>
       {children}
     </div>
   );

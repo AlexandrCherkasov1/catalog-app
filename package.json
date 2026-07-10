@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "format": "node scripts/format.mjs",
     "format:check": "node scripts/check-format.mjs",
-    "test": "npm run typecheck",
+    "test": "npm run typecheck && node scripts/run-tests.mjs",
     "prepare": "husky"
   },
   "dependencies": {

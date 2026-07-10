@@ -1,24 +1,26 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  getProductPrice,
+  ALL_CATALOG_FILTER_VALUE,
+  filterAndSortProducts,
+  getCatalogCategories,
+  getCatalogPage,
+  getCatalogProductTypes,
   ProductCard,
+  PRODUCTS_PER_PAGE,
   useGetProductsQuery,
-  type ProductDto,
+  type AvailabilityFilter,
+  type CatalogSortValue,
 } from "@entities/product";
 import { Button, Card, EmptyState, Skeleton } from "@shared/ui";
 
 import styles from "./product-catalog.module.scss";
 
 const SKELETON_COUNT = 8;
-const PRODUCTS_PER_PAGE = 8;
 const SEARCH_DEBOUNCE_MS = 350;
-const ALL_VALUE = "all";
-
-type AvailabilityFilter = "all" | "available" | "unavailable";
-type SortValue = "default" | "price-asc" | "price-desc" | "name-asc";
 
 function CatalogSkeleton() {
   return (
@@ -38,56 +40,20 @@ function CatalogSkeleton() {
   );
 }
 
-function getProductCategory(product: ProductDto) {
-  const [rawCategory = "Другое"] = product.name.trim().split(/\s+/);
-  const category = rawCategory.toLowerCase();
-
-  if (category === "ружьё" || category === "ружье") {
-    return "Ружье";
-  }
-
-  return category.charAt(0).toUpperCase() + category.slice(1);
-}
-
-function getProductType(product: ProductDto) {
-  const action = product.characteristics.find(
-    (characteristic) => characteristic.name === "action",
-  )?.value;
-
-  if (action) {
-    return action;
-  }
-
-  const name = product.name.toLowerCase();
-
-  if (
-    name.includes("semiauto") ||
-    name.includes("полуавтомат") ||
-    name.includes("п/а")
-  ) {
-    return "Полуавтоматический";
-  }
-
-  return null;
-}
-
-function sortValues(values: string[]) {
-  return [...values].sort((firstValue, secondValue) =>
-    firstValue.localeCompare(secondValue, "ru"),
-  );
-}
-
 export function ProductCatalog() {
+  const searchParams = useSearchParams();
+  const querySearch = searchParams.get("search") ?? "";
   const { data, isError, isLoading, refetch } = useGetProductsQuery();
-  const [searchValue, setSearchValue] = useState("");
-  const [debouncedSearchValue, setDebouncedSearchValue] = useState("");
-  const [availability, setAvailability] =
-    useState<AvailabilityFilter>(ALL_VALUE);
+  const [searchValue, setSearchValue] = useState(querySearch);
+  const [debouncedSearchValue, setDebouncedSearchValue] = useState(querySearch);
+  const [availability, setAvailability] = useState<AvailabilityFilter>(
+    ALL_CATALOG_FILTER_VALUE,
+  );
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [category, setCategory] = useState(ALL_VALUE);
-  const [productType, setProductType] = useState(ALL_VALUE);
-  const [sort, setSort] = useState<SortValue>("default");
+  const [category, setCategory] = useState(ALL_CATALOG_FILTER_VALUE);
+  const [productType, setProductType] = useState(ALL_CATALOG_FILTER_VALUE);
+  const [sort, setSort] = useState<CatalogSortValue>("default");
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -98,16 +64,17 @@ export function ProductCatalog() {
     return () => window.clearTimeout(timeoutId);
   }, [searchValue]);
 
+  useEffect(() => {
+    setSearchValue(querySearch);
+    setDebouncedSearchValue(querySearch.trim().toLowerCase());
+  }, [querySearch]);
+
   const categories = useMemo(() => {
     if (!data) {
       return [];
     }
 
-    return sortValues(
-      Array.from(
-        new Set(data.items.map((product) => getProductCategory(product))),
-      ),
-    );
+    return getCatalogCategories(data.items);
   }, [data]);
 
   const productTypes = useMemo(() => {
@@ -115,15 +82,7 @@ export function ProductCatalog() {
       return [];
     }
 
-    return sortValues(
-      Array.from(
-        new Set(
-          data.items
-            .map((product) => getProductType(product))
-            .filter((type): type is string => Boolean(type)),
-        ),
-      ),
-    );
+    return getCatalogProductTypes(data.items);
   }, [data]);
 
   const filteredProducts = useMemo(() => {
@@ -131,55 +90,15 @@ export function ProductCatalog() {
       return [];
     }
 
-    const minPriceValue = minPrice === "" ? null : Number(minPrice);
-    const maxPriceValue = maxPrice === "" ? null : Number(maxPrice);
-
-    return data.items
-      .filter((product) => {
-        const price = getProductPrice(product);
-        const matchesSearch =
-          debouncedSearchValue === "" ||
-          product.name.toLowerCase().includes(debouncedSearchValue);
-        const matchesAvailability =
-          availability === ALL_VALUE ||
-          (availability === "available" && product.available) ||
-          (availability === "unavailable" && !product.available);
-        const matchesMinPrice =
-          minPriceValue === null ||
-          (Number.isFinite(minPriceValue) && price >= minPriceValue);
-        const matchesMaxPrice =
-          maxPriceValue === null ||
-          (Number.isFinite(maxPriceValue) && price <= maxPriceValue);
-        const matchesCategory =
-          category === ALL_VALUE || getProductCategory(product) === category;
-        const matchesType =
-          productType === ALL_VALUE || getProductType(product) === productType;
-
-        return (
-          matchesSearch &&
-          matchesAvailability &&
-          matchesMinPrice &&
-          matchesMaxPrice &&
-          matchesCategory &&
-          matchesType
-        );
-      })
-      .sort((firstProduct, secondProduct) => {
-        switch (sort) {
-          case "price-asc":
-            return (
-              getProductPrice(firstProduct) - getProductPrice(secondProduct)
-            );
-          case "price-desc":
-            return (
-              getProductPrice(secondProduct) - getProductPrice(firstProduct)
-            );
-          case "name-asc":
-            return firstProduct.name.localeCompare(secondProduct.name, "ru");
-          default:
-            return 0;
-        }
-      });
+    return filterAndSortProducts(data.items, {
+      availability,
+      category,
+      maxPrice,
+      minPrice,
+      productType,
+      search: debouncedSearchValue,
+      sort,
+    });
   }, [
     availability,
     category,
@@ -195,11 +114,7 @@ export function ProductCatalog() {
     1,
     Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE),
   );
-  const pageStartIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const pageProducts = filteredProducts.slice(
-    pageStartIndex,
-    pageStartIndex + PRODUCTS_PER_PAGE,
-  );
+  const pageProducts = getCatalogPage(filteredProducts, currentPage);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -222,11 +137,11 @@ export function ProductCatalog() {
   function resetFilters() {
     setSearchValue("");
     setDebouncedSearchValue("");
-    setAvailability(ALL_VALUE);
+    setAvailability(ALL_CATALOG_FILTER_VALUE);
     setMinPrice("");
     setMaxPrice("");
-    setCategory(ALL_VALUE);
-    setProductType(ALL_VALUE);
+    setCategory(ALL_CATALOG_FILTER_VALUE);
+    setProductType(ALL_CATALOG_FILTER_VALUE);
     setSort("default");
     setCurrentPage(1);
   }
@@ -274,7 +189,7 @@ export function ProductCatalog() {
               setAvailability(event.target.value as AvailabilityFilter)
             }
           >
-            <option value={ALL_VALUE}>Все</option>
+            <option value={ALL_CATALOG_FILTER_VALUE}>Все</option>
             <option value="available">В наличии</option>
             <option value="unavailable">Нет в наличии</option>
           </select>
@@ -305,7 +220,7 @@ export function ProductCatalog() {
             value={category}
             onChange={(event) => setCategory(event.target.value)}
           >
-            <option value={ALL_VALUE}>Все</option>
+            <option value={ALL_CATALOG_FILTER_VALUE}>Все</option>
             {categories.map((categoryItem) => (
               <option value={categoryItem} key={categoryItem}>
                 {categoryItem}
@@ -319,7 +234,7 @@ export function ProductCatalog() {
             value={productType}
             onChange={(event) => setProductType(event.target.value)}
           >
-            <option value={ALL_VALUE}>Все</option>
+            <option value={ALL_CATALOG_FILTER_VALUE}>Все</option>
             {productTypes.map((type) => (
               <option value={type} key={type}>
                 {type}
@@ -331,12 +246,15 @@ export function ProductCatalog() {
           <span>Сортировка</span>
           <select
             value={sort}
-            onChange={(event) => setSort(event.target.value as SortValue)}
+            onChange={(event) =>
+              setSort(event.target.value as CatalogSortValue)
+            }
           >
             <option value="default">По умолчанию</option>
             <option value="price-asc">Сначала дешевле</option>
             <option value="price-desc">Сначала дороже</option>
             <option value="name-asc">По названию</option>
+            <option value="rating-desc">По рейтингу</option>
           </select>
         </label>
         <Button variant="outline" onClick={resetFilters}>

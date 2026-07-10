@@ -1,5 +1,21 @@
 export { productsApi, useGetProductsQuery } from "./api";
-export { getProductPrice } from "./lib";
+export {
+  ALL_CATALOG_FILTER_VALUE,
+  filterAndSortProducts,
+  getCatalogCategories,
+  getCatalogPage,
+  getCatalogProductTypes,
+  getProductCategory,
+  getProductPrice,
+  getProductType,
+  PRODUCTS_PER_PAGE,
+  sortCatalogValues,
+} from "./lib";
+export type {
+  AvailabilityFilter,
+  CatalogFilters,
+  CatalogSortValue,
+} from "./lib";
 export {
   addToCart,
   addToFavorites,
@@ -27,4 +43,4 @@ export type {
   ProductsResponseDto,
   ProductTraitsDto,
 } from "./model";
-export { ProductCard } from "./ui";
+export { ProductActions, ProductCard } from "./ui";
