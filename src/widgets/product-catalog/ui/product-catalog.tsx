@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ALL_CATALOG_FILTER_VALUE,
@@ -14,6 +15,7 @@ import {
   useGetProductsQuery,
   type AvailabilityFilter,
   type CatalogSortValue,
+  type ProductsResponseDto,
 } from "@entities/product";
 import { Button, Card, EmptyState, Skeleton } from "@shared/ui";
 
@@ -40,10 +42,21 @@ function CatalogSkeleton() {
   );
 }
 
-export function ProductCatalog() {
+interface ProductCatalogProps {
+  initialData?: ProductsResponseDto;
+  initialPage?: number;
+}
+
+export function ProductCatalog({
+  initialData,
+  initialPage = 1,
+}: ProductCatalogProps) {
   const searchParams = useSearchParams();
   const querySearch = searchParams.get("search") ?? "";
-  const { data, isError, isLoading, refetch } = useGetProductsQuery();
+  const query = useGetProductsQuery();
+  const data = query.data ?? initialData;
+  const isError = query.isError && !data;
+  const isLoading = query.isLoading && !data;
   const [searchValue, setSearchValue] = useState(querySearch);
   const [debouncedSearchValue, setDebouncedSearchValue] = useState(querySearch);
   const [availability, setAvailability] = useState<AvailabilityFilter>(
@@ -54,7 +67,8 @@ export function ProductCatalog() {
   const [category, setCategory] = useState(ALL_CATALOG_FILTER_VALUE);
   const [productType, setProductType] = useState(ALL_CATALOG_FILTER_VALUE);
   const [sort, setSort] = useState<CatalogSortValue>("default");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const filtersMountedRef = useRef(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -117,7 +131,11 @@ export function ProductCatalog() {
   const pageProducts = getCatalogPage(filteredProducts, currentPage);
 
   useEffect(() => {
-    setCurrentPage(1);
+    if (filtersMountedRef.current) {
+      setCurrentPage(1);
+    } else {
+      filtersMountedRef.current = true;
+    }
   }, [
     availability,
     category,
@@ -127,6 +145,10 @@ export function ProductCatalog() {
     productType,
     sort,
   ]);
+
+  useEffect(() => {
+    setCurrentPage(initialPage);
+  }, [initialPage]);
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -146,6 +168,20 @@ export function ProductCatalog() {
     setCurrentPage(1);
   }
 
+  function getPageHref(page: number) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (page === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(page));
+    }
+
+    const queryString = params.toString();
+
+    return queryString ? `/?${queryString}` : "/";
+  }
+
   if (isLoading) {
     return <CatalogSkeleton />;
   }
@@ -155,7 +191,7 @@ export function ProductCatalog() {
       <EmptyState
         title="Не удалось загрузить товары"
         description="Проверьте подключение к интернету и попробуйте еще раз."
-        action={<Button onClick={() => void refetch()}>Повторить</Button>}
+        action={<Button onClick={() => void query.refetch()}>Повторить</Button>}
       />
     );
   }
@@ -280,37 +316,42 @@ export function ProductCatalog() {
           </div>
           {totalPages > 1 && (
             <nav className={styles.pagination} aria-label="Страницы каталога">
-              <Button
-                variant="outline"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((page) => page - 1)}
-              >
-                Назад
-              </Button>
+              {currentPage === 1 ? (
+                <span className={styles.disabledPageLink}>Назад</span>
+              ) : (
+                <Link
+                  className={styles.pageLink}
+                  href={getPageHref(currentPage - 1)}
+                >
+                  Назад
+                </Link>
+              )}
               <div className={styles.pages}>
                 {Array.from({ length: totalPages }, (_, index) => {
                   const page = index + 1;
 
                   return (
-                    <button
+                    <Link
                       className={page === currentPage ? styles.currentPage : ""}
-                      type="button"
+                      href={getPageHref(page)}
                       key={page}
                       aria-current={page === currentPage ? "page" : undefined}
-                      onClick={() => setCurrentPage(page)}
                     >
                       {page}
-                    </button>
+                    </Link>
                   );
                 })}
               </div>
-              <Button
-                variant="outline"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((page) => page + 1)}
-              >
-                Вперед
-              </Button>
+              {currentPage === totalPages ? (
+                <span className={styles.disabledPageLink}>Вперед</span>
+              ) : (
+                <Link
+                  className={styles.pageLink}
+                  href={getPageHref(currentPage + 1)}
+                >
+                  Вперед
+                </Link>
+              )}
             </nav>
           )}
         </>

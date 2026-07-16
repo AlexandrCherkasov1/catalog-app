@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 
 import { AppLayout } from "@widgets/app-layout";
+import { SITE_URL } from "@shared/config/site";
 
 import { StoreProvider } from "./providers";
 import "./globals.scss";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Охотничий каталог",
   description: "Каталог товаров с корзиной и избранным",
 };

@@ -8,6 +8,7 @@ export {
   getProductCategory,
   getProductPrice,
   getProductType,
+  normalizeProductsResponse,
   PRODUCTS_PER_PAGE,
   sortCatalogValues,
 } from "./lib";

@@ -1,4 +1,4 @@
-import type { ProductDto } from "../model";
+import type { ProductDto, ProductsResponseDto } from "../model";
 import { getProductPrice } from "./get-product-price";
 
 export const ALL_CATALOG_FILTER_VALUE = "all";
@@ -142,4 +142,17 @@ export function getCatalogPage<T>(
   const startIndex = (safePage - 1) * perPage;
 
   return items.slice(startIndex, startIndex + perPage);
+}
+
+export function normalizeProductsResponse(response: ProductsResponseDto) {
+  return {
+    ...response,
+    items: response.items.map((product) => ({
+      ...product,
+      preview_picture: product.preview_picture?.replace(
+        "https://ohotaktiv.ru",
+        "https://img.ohotaktiv.ru",
+      ),
+    })),
+  };
 }

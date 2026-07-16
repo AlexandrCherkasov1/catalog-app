@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   getProductPrice,
   ProductActions,
+  type ProductDto,
   useGetProductsQuery,
 } from "@entities/product";
 import {
@@ -20,6 +21,7 @@ import {
 import styles from "./product-details.module.scss";
 
 interface ProductDetailsProps {
+  initialProduct?: ProductDto;
   productId: number;
 }
 
@@ -43,8 +45,15 @@ function ProductDetailsSkeleton() {
   );
 }
 
-export function ProductDetails({ productId }: ProductDetailsProps) {
-  const { data, isError, isLoading, refetch } = useGetProductsQuery();
+export function ProductDetails({
+  initialProduct,
+  productId,
+}: ProductDetailsProps) {
+  const query = useGetProductsQuery();
+  const product =
+    query.data?.items.find((item) => item.id === productId) ?? initialProduct;
+  const isError = query.isError && !product;
+  const isLoading = query.isLoading && !product;
 
   if (isLoading) {
     return <ProductDetailsSkeleton />;
@@ -55,12 +64,10 @@ export function ProductDetails({ productId }: ProductDetailsProps) {
       <EmptyState
         title="Не удалось загрузить товар"
         description="Проверьте подключение и попробуйте еще раз."
-        action={<Button onClick={() => void refetch()}>Повторить</Button>}
+        action={<Button onClick={() => void query.refetch()}>Повторить</Button>}
       />
     );
   }
-
-  const product = data?.items.find((item) => item.id === productId);
 
   if (!product) {
     return (

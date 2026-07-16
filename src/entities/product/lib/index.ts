@@ -6,6 +6,7 @@ export {
   getCatalogProductTypes,
   getProductCategory,
   getProductType,
+  normalizeProductsResponse,
   PRODUCTS_PER_PAGE,
   sortCatalogValues,
 } from "./catalog";

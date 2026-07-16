@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import type { ProductsResponseDto } from "../model";
+import { normalizeProductsResponse } from "../lib";
 
 export const productsApi = createApi({
   reducerPath: "productsApi",
@@ -9,16 +10,7 @@ export const productsApi = createApi({
   endpoints: (builder) => ({
     getProducts: builder.query<ProductsResponseDto, void>({
       query: () => "/products",
-      transformResponse: (response: ProductsResponseDto) => ({
-        ...response,
-        items: response.items.map((product) => ({
-          ...product,
-          preview_picture: product.preview_picture?.replace(
-            "https://ohotaktiv.ru",
-            "https://img.ohotaktiv.ru",
-          ),
-        })),
-      }),
+      transformResponse: normalizeProductsResponse,
       providesTags: ["Products"],
     }),
   }),
